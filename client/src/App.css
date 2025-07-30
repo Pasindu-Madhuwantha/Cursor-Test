@@ -1,0 +1,111 @@
+/* Additional App-specific styles */
+.todo-app {
+  position: relative;
+  overflow: hidden;
+}
+
+.todo-app::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+  background-size: 200% 100%;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.todo-header h1 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.todo-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.todo-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+
+.todo-item:hover::before {
+  left: 100%;
+}
+
+.todo-checkbox:checked + .todo-content .todo-title {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-checkbox:checked + .todo-content .todo-description {
+  text-decoration: line-through;
+  color: #ccc;
+}
+
+.todo-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.todo-button:disabled:hover {
+  transform: none;
+}
+
+/* Animation for new todos */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.todo-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+  .todo-app {
+    padding: 20px;
+    margin-top: 20px;
+  }
+  
+  .todo-header h1 {
+    font-size: 2rem;
+  }
+  
+  .todo-form {
+    gap: 8px;
+  }
+  
+  .todo-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .todo-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+} 
