@@ -10,9 +10,9 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
 
-  const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? '/api' 
-    : 'http://localhost:5000/api';
+  // Use REACT_APP_API_URL if set, otherwise fallback
+  const API_BASE_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api');
+  console.log('API_BASE_URL:', API_BASE_URL);
 
   // Fetch todos
   const fetchTodos = async () => {

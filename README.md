@@ -21,120 +21,84 @@ A full-stack todo list application built with React frontend, Node.js/Express ba
 ### Backend
 - **Node.js** - Runtime environment
 - **Express** - Web framework
-- **MongoDB** - Database
+- **MongoDB** - Database (Atlas or local)
 - **Mongoose** - MongoDB ODM
 
 ## Prerequisites
 
-Before running this application, make sure you have the following installed:
-
 - **Node.js** (v14 or higher)
-- **MongoDB** (local installation or MongoDB Atlas)
 - **npm** or **yarn**
+- **Docker** and **Docker Compose** (for containerized setup)
+- **MongoDB Atlas** account (or use local MongoDB)
 
-## Installation
+## Running with Docker Compose (Recommended)
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd todo-app
-   ```
+This project is fully containerized. Docker Compose will run the backend, frontend, and MongoDB (or connect to MongoDB Atlas).
 
-2. **Install dependencies**
-   ```bash
-   # Install backend dependencies
+### 1. Configure MongoDB
+
+- By default, the backend is set up to use a MongoDB Atlas connection string (see `docker-compose.yml`).
+- **Update the `MONGODB_URI` in `docker-compose.yml`** to your own Atlas connection string for production use.
+- If you want to use local MongoDB, change it to:
+  ```
+  MONGODB_URI=mongodb://mongodb:27017/todo-app
+  ```
+
+### 2. Build and Start All Services
+
+```sh
+# From the project root
+# This will build and start backend, frontend, and MongoDB
+
+docker-compose up --build
+```
+
+- Frontend: [http://localhost](http://localhost)
+- Backend API: [http://localhost:5000/api](http://localhost:5000/api)
+
+### 3. API URL Configuration
+
+- The frontend is built with the API base URL set via Docker build args:
+  - `REACT_APP_API_URL=http://localhost:5000/api`
+- This is set in the `docker-compose.yml` under `frontend.build.args`.
+- If you change the backend port or service name, update this value accordingly.
+
+### 4. Stopping the Services
+
+```sh
+docker-compose down
+```
+
+---
+
+## Running Locally (Without Docker)
+
+1. **Install dependencies:**
+   ```sh
    npm install
-   
-   # Install frontend dependencies
-   cd client
-   npm install
+   cd client && npm install
    cd ..
    ```
-
-3. **Set up MongoDB**
-   
-   **Option A: Local MongoDB**
-   - Install MongoDB locally
-   - Start MongoDB service
-   - The app will connect to `mongodb://localhost:27017/todo-app`
-
-   **Option B: MongoDB Atlas**
-   - Create a MongoDB Atlas account
-   - Create a new cluster
-   - Get your connection string
-   - Create a `.env` file in the root directory:
+2. **Set up MongoDB:**
+   - Use MongoDB Atlas (recommended) or run MongoDB locally.
+   - Create a `.env` file in the project root:
      ```
-     MONGODB_URI=your_mongodb_atlas_connection_string
+     MONGODB_URI=your_mongodb_connection_string
      PORT=5000
      NODE_ENV=development
      ```
-
-## Running the Application
-
-### Development Mode
-
-1. **Start the backend server**
-   ```bash
+3. **Start the backend:**
+   ```sh
    npm run server
    ```
-   The server will run on `http://localhost:5000`
-
-2. **Start the frontend**
-   ```bash
-   npm run client
-   ```
-   The React app will run on `http://localhost:3000`
-
-3. **Or run both simultaneously**
-   ```bash
-   npm run dev
-   ```
-
-### Production Mode
-
-1. **Build the frontend**
-   ```bash
+4. **Start the frontend:**
+   ```sh
    cd client
-   npm run build
-   cd ..
-   ```
-
-2. **Start the production server**
-   ```bash
    npm start
    ```
+   The React app will run on [http://localhost:3000](http://localhost:3000) and proxy API requests to the backend.
 
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/todos` | Get all todos |
-| GET | `/api/todos/:id` | Get single todo |
-| POST | `/api/todos` | Create a new todo |
-| PUT | `/api/todos/:id` | Update a todo |
-| DELETE | `/api/todos/:id` | Delete a todo |
-| GET | `/api/health` | Health check |
-
-### Request/Response Examples
-
-**Create Todo**
-```json
-POST /api/todos
-{
-  "title": "Buy groceries",
-  "description": "Milk, bread, eggs"
-}
-```
-
-**Update Todo**
-```json
-PUT /api/todos/:id
-{
-  "title": "Buy groceries",
-  "description": "Milk, bread, eggs, butter",
-  "completed": true
-}
-```
+---
 
 ## Project Structure
 
@@ -147,6 +111,7 @@ todo-app/
 │   │   ├── App.css        # Component styles
 │   │   ├── index.js       # React entry point
 │   │   └── index.css      # Global styles
+│   ├── Dockerfile         # Frontend Dockerfile
 │   └── package.json
 ├── server/                 # Node.js backend
 │   ├── config/
@@ -160,77 +125,46 @@ todo-app/
 │   ├── routes/
 │   │   └── todos.js       # API routes
 │   └── index.js           # Express server
-├── package.json           # Root package.json
+├── Dockerfile              # Backend Dockerfile
+├── package.json            # Root package.json
+├── docker-compose.yml      # Docker Compose file
 └── README.md
 ```
 
-## Features in Detail
+---
 
-### Frontend Features
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Real-time Updates**: Changes reflect immediately without page refresh
-- **Smooth Animations**: Modern CSS animations for better UX
-- **Error Handling**: User-friendly error messages
-- **Loading States**: Visual feedback during API calls
+## Environment Variables
 
-### Backend Features
-- **RESTful API**: Clean, standard REST endpoints
-- **MongoDB Integration**: Persistent data storage
-- **Error Handling**: Comprehensive error handling and validation
-- **CORS Support**: Cross-origin requests enabled
-- **Environment Configuration**: Flexible configuration via environment variables
+- **Backend:**
+  - `MONGODB_URI` - MongoDB connection string (Atlas or local)
+  - `PORT` - Port for Express server (default: 5000)
+  - `NODE_ENV` - Environment (production/development)
+- **Frontend:**
+  - `REACT_APP_API_URL` - API base URL (set via Docker build args in Compose)
 
-## Customization
-
-### Styling
-- Modify `client/src/index.css` for global styles
-- Modify `client/src/App.css` for component-specific styles
-- The app uses a purple gradient theme that can be easily changed
-
-### Database Schema
-The todo schema in `server/models/Todo.js` can be extended:
-```javascript
-const todoSchema = new mongoose.Schema({
-  title: { type: String, required: true, trim: true },
-  description: { type: String, trim: true },
-  completed: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
-  // Add more fields as needed
-});
-```
+---
 
 ## Troubleshooting
 
-### Common Issues
+- **Frontend not fetching data in Docker Compose?**
+  - Make sure you rebuilt the frontend image after changing `REACT_APP_API_URL`.
+  - Check the browser console for `API_BASE_URL` log.
+  - Ensure the backend is healthy and accessible at the expected URL.
+- **MongoDB connection issues?**
+  - Double-check your Atlas URI or local MongoDB setup.
+  - If using Atlas, ensure your IP is whitelisted and credentials are correct.
+- **Port conflicts?**
+  - Make sure ports 80, 5000, and 27017 are not in use by other processes.
+- **Container name conflicts?**
+  - Remove old containers with `docker rm -f <container_name>` if needed.
 
-1. **MongoDB Connection Error**
-   - Ensure MongoDB is running
-   - Check your connection string
-   - Verify network connectivity
-
-2. **Port Already in Use**
-   - Change the port in `.env` file
-   - Kill processes using the port
-
-3. **CORS Errors**
-   - The backend has CORS enabled
-   - Ensure the frontend is running on the correct port
-
-4. **Module Not Found Errors**
-   - Run `npm install` in both root and client directories
-   - Clear node_modules and reinstall if needed
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+---
 
 ## License
 
 This project is licensed under the MIT License.
+
+---
 
 ## Support
 
